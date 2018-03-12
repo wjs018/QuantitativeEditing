@@ -1,118 +1,101 @@
 import scenedetect
+import detect_scenes as ds
+import gc
 
 from moviepy.editor import *
 
-
-#Wrapper in order to use python api in pyscenedetect
-class PySceneDetectArgs(object):
-
-    def __init__(self, input, threshold=40, min_scene_len=15, type='content'):
-        self.input = input
-        self.detection_method = type
-        self.threshold = threshold
-        self.min_scene_len = min_scene_len
-        self.min_percent = 95
-        self.block_size = 8
-        self.downscale_factor = 1
-        self.frame_skip = 0
-        self.save_images = False
-        self.save_image_prefix = ''
-        self.start_time = None
-        self.end_time = None
-        self.duration = None
-        self.quiet_mode = True
-        self.stats_file = None
-
-
 if __name__ == '__main__':
     
-    #Specify video location here
-    video_file = '/home/walter/Videos/Music Videos/BTS_2017_DNA.mkv'
+    # Specify video location here
+    video_file = 'BTS_2016_Fire.mkv'
+    outfile_prefix = 'BTS_2016_Fire_'
     
-    #Specify range to vary for threshold value
+    # Specify range to vary for threshold value
     for threshold in range(30, 41):
         
-        #Try a couple different minimum scene lengths for each threshold
+        # Try a couple different minimum scene lengths for each threshold
         for min_scene_len in [5, 10, 15]:
             
-            #Get list of available detectors
-            detector = scenedetect.detectors.get_available()
+            # Analyze the video
+            video_fps, frames_read, _, scene_list = ds.analyze_video(
+                video_file, threshold=threshold, min_scene_len=min_scene_len,
+                type='content', downscale_factor=4)
             
-            #Define a pyscenedetect manager using our wrapper class defined 
-            #above to set parameters how we want
-            manager = scenedetect.manager.SceneManager(
-                PySceneDetectArgs(input=video_file, threshold=threshold,
-                                  min_scene_len=min_scene_len), detector)
+            # Convert detected scenes to time
+            scene_list_msec = [(1000.0 * x) / float(video_fps)
+                               for x in scene_list]
             
-            #Actually run the scene detection on the video
-            video_fps, frames_read, frames_processed = scenedetect.detect_scenes_file(video_file, manager)
-            
-            #Extract scene info from the manager
-            scene_list = manager.scene_list
-            scene_list_msec = [(1000.0 * x) / float(video_fps) for x in scene_list]
-            scene_list_tc = [scenedetect.timecodes.get_string(x) for x in scene_list_msec]
-            
-            #Pull music video file into moviepy
+            # Pull music video file into moviepy
             mv_clip = VideoFileClip(video_file)
             W, H = mv_clip.size
             
+            # Initialize some variables
             scene = 0
             previous_scene_msec = 0
             textclip_list = []
             
-            #Loop over list of scenes, creating TextClips for each scene
-            for scene_idx in range(len(scene_list_tc) + 1):
+            # Loop over list of scenes, creating TextClips for each scene
+            for scene_idx in range(len(scene_list_msec) + 1):
                 
-                #Each iteration is the same except for the final scene which is
-                #handled separately in the else statement
-                if scene_idx != len(scene_list_tc):
+                # Each iteration is the same except for the final scene which is
+                # handled separately in the else statement
+                if scene_idx != len(scene_list_msec):
                     
-                    #Calculate duration of the scene in seconds
+                    # Calculate duration of the scene in seconds
                     duration = (scene_list_msec[scene_idx] - 
                                 previous_scene_msec) / 1000
                     
-                    #Record ending time of scene for the next loop
+                    # Record ending time of scene for the next loop
                     previous_scene_msec = scene_list_msec[scene_idx]
                     
-                    #Make the video clips of the numbers
-                    txtclip = TextClip("%03d" % scene_idx, fontsize=288,
-                                       color='white', font='Ubuntu Mono',
-                                       stroke_color='black',stroke_width=5).\
-                                       set_pos('center').\
-                                       set_duration(duration).set_opacity(0.6)
+                    # Make the video clips of the numbers
+                    txtclip = (TextClip("%03d" % scene_idx, fontsize=288,
+                                        color='white', font='FreeMono-Bold',
+                                        stroke_color='black', stroke_width=5).
+                                        set_pos('center').
+                                        set_duration(duration).set_opacity(0.6))
                     
-                    #Add the clip to a list of all the TextClips
+                    # Add the clip to a list of all the TextClips
                     textclip_list.append(txtclip)
                 
-                #Last scene needs special treatment
+                # Last scene needs special treatment
                 else:
                     
-                    #Calculate the total duration of the video
+                    # Calculate the total duration of the video
                     total_duration_msec = frames_read / float(video_fps) * 1000
                     
-                    #Calculate the duration of the final scene
+                    # Calculate the duration of the final scene
                     clip_duration = (total_duration_msec - 
                                      previous_scene_msec) / 1000
                     
-                    #Create the TextClip for the final scene
-                    txtclip = TextClip("%03d" % scene_idx, fontsize=288,
-                                       color='white', font='Ubuntu Mono',
-                                       stroke_color='black', stroke_width=5).\
-                                       set_pos('center').\
-                                       set_duration(clip_duration).set_opacity(0.6)
+                    # Create the TextClip for the final scene
+                    txtclip = (TextClip("%03d" % scene_idx, fontsize=288,
+                                        color='white', font='FreeMono-Bold',
+                                        stroke_color='black', stroke_width=5).
+                                        set_pos('center').
+                                        set_duration(clip_duration).
+                                        set_opacity(0.6))
                     
-                    #Add it to the list of other TextClips
+                    # Add it to the list of other TextClips
                     textclip_list.append(txtclip)
             
-            #Play the TextClips one after the other
+            # Play the TextClips one after the other
             final_textclip = concatenate_videoclips(textclip_list).set_pos('center')
             
-            #Play the TextClips over the original video
+            # Play the TextClips over the original video
             final_video = CompositeVideoClip([mv_clip, final_textclip],
                                              size=(W, H))
             
-            #Save resulting video to file, formatting name to avoid overwrites
-            final_video.write_videofile('BTS_2017_DNA_Annotated_' + 
+            # Save resulting video to file, formatting name to avoid overwrites
+            final_video.write_videofile(outfile_prefix + 
                                         str(threshold) + '_' + 
                                         str(min_scene_len) + '.mp4',
                                         fps=video_fps, preset='ultrafast')
+            
+            # Having some memory overflow problems on my laptop, deleting some
+            # variables and forcing garbage collection fixes that
+            del txtclip
+            del textclip_list
+            del final_textclip
+            del final_video
+            gc.collect()
