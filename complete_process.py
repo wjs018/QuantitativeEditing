@@ -11,16 +11,16 @@ from moviepy.video.io.bindings import mplfig_to_npimage
 if __name__ == '__main__':
     
     # Some video constants to set
-    youtube_link = 'https://www.youtube.com/watch?v=xEeFrLSkMm8'
-    video_title = 'Spring Day'
+    youtube_link = 'https://www.youtube.com/watch?v=ALj5MKjy2BU'
+    video_title = 'Fire'
     artist_name = 'BTS'
-    video_year = '2017'
+    video_year = '2016'
     include_audio = False
     render_audioplot = True  # Time intensive, 2+ hours on my laptop
     
     # Some scenedetect constants to set
-    threshold = 21
-    min_scene_len = 15
+    threshold = 37
+    min_scene_len = 10
     
     # Download the video, setting the name first
     print('Downloading video...')
@@ -110,7 +110,7 @@ if __name__ == '__main__':
     # Save resulting video to file
     outfile = ('_'.join([artist_name, video_year, video_title, 'annotated'])
                + '.mp4')
-    annotated_video.write_videofile(outfile, fps=video_fps, preset='medium')
+#    annotated_video.write_videofile(outfile, fps=video_fps, preset='medium')
     
     # Done annotating video
     print('Done making annotated video! Next to make concurrent graphs...')
@@ -232,7 +232,7 @@ if __name__ == '__main__':
     
     # Use our function to animate a video and save it to file
     animation1 = VideoClip(make_frame1, duration=duration).resize(height=H / 2.0)
-    animation1.write_videofile('animation1.mp4', fps=video_fps)
+#    animation1.write_videofile('animation1.mp4', fps=video_fps)
     plt.close()
     
     # Print progress so far
@@ -273,7 +273,7 @@ if __name__ == '__main__':
     
     # Animate the graph and save it to file
     animation2 = VideoClip(make_frame2, duration=duration).resize(height=H / 2.0)
-    animation2.write_videofile('animation2.mp4', fps=video_fps)
+#    animation2.write_videofile('animation2.mp4', fps=video_fps)
     
     if not render_audioplot:
         

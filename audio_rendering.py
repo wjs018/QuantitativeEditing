@@ -7,6 +7,10 @@ from librosa.display import waveplot
 from moviepy.video.io.bindings import mplfig_to_npimage
 
 
+last_t = 0
+tempgraph = []
+
+
 def animate_audio(video, audio, output):
     """
     Renders a waveform of a video's audio and progresses it every 0.5s as the
@@ -30,6 +34,9 @@ def animate_audio(video, audio, output):
     output
       Simply returns the filepath to the saved output video
     """
+    
+    global last_t
+    global tempgraph
     
     # Load video and extract audio to file
     video_file = VideoFileClip(video)
@@ -82,8 +89,8 @@ def animate_audio(video, audio, output):
         return tempgraph
     
     # Make a video of the animated graph and save it
-    animation1 = VideoClip(animate, duration=video.duration)
-    animation1.write_videofile(output, fps=video.fps)
+    animation1 = VideoClip(animate, duration=video_file.duration)
+    animation1.write_videofile(output, fps=video_file.fps)
     
     return output
 
