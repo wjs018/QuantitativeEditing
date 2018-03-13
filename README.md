@@ -4,6 +4,8 @@ This repository consists of code written to support a hobby project of mine, qua
 
 Unlike the creator of that video linked above, I have no experience actually editing video, nor the time to exhaustively go frame by frame through a video to analyze it. Instead, I have put together some code in this repository to both analyze a video and attempt to automatically detect scene transitions as well as create a video visualizing those transitions. Below I will walk through my methodology and outline the workflow I use to analyze and create a video.
 
+To see some of the results of the code in this repository, feel free to check out the [YouTube channel](https://www.youtube.com/channel/UCoOUknptLNANAOldpk-27RQ) I created to place videos after analysis.
+
 ## Outline of Methodology
 
 The basic workflow I use when analyzing a video is as follows:
