@@ -44,7 +44,7 @@ if __name__ == '__main__':
         in_window_scenes = scene_times[np.where(current_time >= scene_times)]
         
         # Keep track of total number of scenes to have passed
-        scene_count.append(len(in_window_scenes) + 1)
+        scene_count.append(len(in_window_scenes))
         
         # Then filter that down to scenes that have happened within the rolling
         # window prior to current frame

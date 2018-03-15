@@ -11,16 +11,16 @@ from moviepy.video.io.bindings import mplfig_to_npimage
 if __name__ == '__main__':
     
     # Some video constants to set
-    youtube_link = 'https://www.youtube.com/watch?v=ALj5MKjy2BU'
-    video_title = 'Fire'
+    youtube_link = 'https://www.youtube.com/watch?v=MBdVXkSdhwU'
+    video_title = 'DNA'
     artist_name = 'BTS'
-    video_year = '2016'
+    video_year = '2017'
     include_audio = False
     render_audioplot = True  # Time intensive, 2+ hours on my laptop
     
     # Some scenedetect constants to set
-    threshold = 37
-    min_scene_len = 10
+    threshold = 21
+    min_scene_len = 15
     
     # Download the video, setting the name first
     print('Downloading video...')
@@ -171,7 +171,7 @@ if __name__ == '__main__':
         in_window_scenes = scene_times[np.where(current_time >= scene_times)]
         
         # Keep track of total number of scenes to have passed
-        scene_count.append(len(in_window_scenes) + 1)
+        scene_count.append(len(in_window_scenes))
         
         # Then filter that down to scenes that have happened within the rolling
         # window prior to current frame
@@ -185,7 +185,7 @@ if __name__ == '__main__':
         rolling_average.append(scenes_per_sec)
     
     # Calculate the average rate at which edits are made
-    avg_rate = scene_count[-1] / (scene_times[-1] / 1000.0)
+    avg_rate = scene_count[-2] / (scene_times[-1] / 1000.0)
     
     # Total duration of the video
     duration = scene_times[-1] / 1000.0
@@ -232,7 +232,7 @@ if __name__ == '__main__':
     
     # Use our function to animate a video and save it to file
     animation1 = VideoClip(make_frame1, duration=duration).resize(height=H / 2.0)
-#    animation1.write_videofile('animation1.mp4', fps=video_fps)
+    animation1.write_videofile('animation1.mp4', fps=video_fps)
     plt.close()
     
     # Print progress so far
@@ -273,7 +273,7 @@ if __name__ == '__main__':
     
     # Animate the graph and save it to file
     animation2 = VideoClip(make_frame2, duration=duration).resize(height=H / 2.0)
-#    animation2.write_videofile('animation2.mp4', fps=video_fps)
+    animation2.write_videofile('animation2.mp4', fps=video_fps)
     
     if not render_audioplot:
         
@@ -299,6 +299,7 @@ if __name__ == '__main__':
         
         # Create the video clip
         animation3 = VideoFileClip(audio_rendering)
+#        animation3 = VideoFileClip('audio_animation.mp4')
     
     # Reload saved videos of graphs as they cannot be composited together
     # until they are each rendered and saved independently
@@ -307,7 +308,7 @@ if __name__ == '__main__':
     
     # Stack the two graphs on top of each other
     animation_array = clips_array([[animation1], [animation2]])
-    animation_array.write_videofile('stacked_animation.mp4', fps=video_fps)
+#    animation_array.write_videofile('stacked_animation.mp4', fps=video_fps)
     
     # Resize the main video
     resized_video = annotated_video.resize(width=(W - animation_array.w))
@@ -329,7 +330,7 @@ if __name__ == '__main__':
                                                final_array.h - 10 - anim_H))])
     
     # Write the output to file
-    final_array.write_videofile('final_composition.mp4', fps=video_fps)
+#    final_array.write_videofile('final_composition.mp4', fps=video_fps)
     
     # Calculate final stats to display after video ends
     sec_per_scene = duration / float(max(scene_count))

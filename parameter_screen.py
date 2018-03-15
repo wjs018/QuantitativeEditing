@@ -7,11 +7,11 @@ from moviepy.editor import *
 if __name__ == '__main__':
     
     # Specify video location here
-    video_file = 'BTS_2016_Fire.mkv'
-    outfile_prefix = 'BTS_2016_Fire_'
+    video_file = 'TWICE_2016_TT.mkv'
+    outfile_prefix = 'TWICE_2016_TT_'
     
     # Specify range to vary for threshold value
-    for threshold in range(30, 41):
+    for threshold in range(37, 41):
         
         # Try a couple different minimum scene lengths for each threshold
         for min_scene_len in [5, 10, 15]:
