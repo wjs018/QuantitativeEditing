@@ -3,10 +3,11 @@ import numpy as np
 import csv
 
 from moviepy.editor import *
+from scenedetect.stats_manager import StatsManager
 
 
-def analyze_video(video_file, threshold=40, min_scene_len=15, type='content',
-                  stats_file=None, downscale_factor=1):
+def analyze_video(video_file, threshold=40, min_scene_len=15, stats_file=None,
+                  downscale_factor=1):
     """
     Analyzes a given video filepath for scene transitions.
     
@@ -21,9 +22,6 @@ def analyze_video(video_file, threshold=40, min_scene_len=15, type='content',
     
     min_scene_len
       minimum length of a scene to be counted as an independent scene in frames
-    
-    type
-      Either 'content' or 'threshold'. See pyscenedetect docs for info.
     
     stats_file
       csv file to dump frame by frame stats of the video to
@@ -49,94 +47,98 @@ def analyze_video(video_file, threshold=40, min_scene_len=15, type='content',
       list of detected scenes from input video with given settings 
     """
     
-    # Get list of detectors
-    detector = scenedetect.detectors.get_available()
+    # First, load into a video manager
+    video_mgr = scenedetect.VideoManager([video_file])
+    stats_mgr = StatsManager()
+    scene_mgr = scenedetect.SceneManager(stats_mgr)
     
-    # Check if stats_file is specified
+    # Add a content detector
+    scene_mgr.add_detector(
+        scenedetect.ContentDetector(threshold=threshold,
+                                    min_scene_len=min_scene_len))
+    
+    # Get the starting timecode
+    base_timecode = video_mgr.get_base_timecode()
+    
+    # Start the video manager
+    video_mgr.set_downscale_factor(downscale_factor)
+    video_mgr.start()
+    
+    # Detect the scenes
+    scene_mgr.detect_scenes(frame_source=video_mgr, start_time=base_timecode)
+    
+    # Retrieve scene list
+    scene_mgr_list = scene_mgr.get_scene_list(base_timecode)
+    
+    # Initialize scene list for analysis
+    scene_list = []
+    
+    # Build our list from the frame_timecode objects
+    for scene in scene_mgr_list:
+        start_frame, end_frame = scene
+        start_frame = start_frame.frame_num
+        scene_list.append(start_frame)
+    
+    # Extract some info
+    video_fps = end_frame.framerate
+    frames_read = end_frame.frame_num
+    frames_processed = frames_read
+    
     if stats_file:
-        with open(stats_file, 'wb') as outfile:    
-            
-            # Build args for pyscenedetect
-            args = PySceneDetectArgs(input=video_file, threshold=threshold,
-                                     min_scene_len=min_scene_len, type=type,
-                                     stats_file=stats_file,
-                                     downscale_factor=downscale_factor)
-            
-            # Make manager
-            manager = scenedetect.manager.SceneManager(args, detector)
-            
-            # Detect scenes
-            video_fps, frames_read, frames_processed = scenedetect.detect_scenes_file(video_file, manager)
-            
-    else:
-        
-        # Build args
-        args = PySceneDetectArgs(input=video_file, threshold=threshold,
-                                 min_scene_len=min_scene_len, type=type,
-                                 stats_file=stats_file,
-                                 downscale_factor=downscale_factor)
-        
-        # Make manager
-        manager = scenedetect.manager.SceneManager(args, detector)
-        
-        # Detect scenes
-        video_fps, frames_read, frames_processed = scenedetect.detect_scenes_file(video_file, manager)
-
-    # Get list of scenes
-    scene_list = manager.scene_list
+        with open(stats_file, 'wb') as stats_csv:
+            stats_mgr.save_to_csv(stats_csv, base_timecode)
+    
+    # Release the video manager
+    video_mgr.release()
     
     return (video_fps, frames_read, frames_processed, scene_list)
-
-
-# Wrapper in order to use python api in pyscenedetect
-class PySceneDetectArgs(object):
-
-    def __init__(self, input, threshold=40, min_scene_len=15, type='content',
-                 stats_file=None, downscale_factor=1):
-        self.input = input
-        self.detection_method = type
-        self.threshold = threshold
-        self.min_scene_len = min_scene_len
-        self.min_percent = 95
-        self.block_size = 8
-        self.downscale_factor = downscale_factor
-        self.frame_skip = 0
-        self.save_images = False
-        self.save_image_prefix = ''
-        self.start_time = None
-        self.end_time = None
-        self.duration = None
-        self.quiet_mode = True
-        self.stats_file = stats_file
 
 
 if __name__ == '__main__':
     
     # Specify video file and constants here
-    video_file = '/home/walter/Videos/Music Videos/BTS_2017_DNA.mkv'
-    threshold = 33
-    min_scene_len = 10
+    video_file = 'BTS_2017_DNA.mkv'
+    threshold = 21
+    min_scene_len = 15
+     
+    # First, load into a video manager
+    video_mgr = scenedetect.VideoManager([video_file])
+    stats_mgr = StatsManager()
+    scene_mgr = scenedetect.SceneManager(stats_mgr)
     
-    # Get list of available detectors
-    detector = scenedetect.detectors.get_available()
+    # Add a content detector
+    scene_mgr.add_detector(
+        scenedetect.ContentDetector(threshold=threshold,
+                                    min_scene_len=min_scene_len))
+    base_timecode = video_mgr.get_base_timecode()
     
-    # Tell pyscenedetect to write a statsfile to a .csv
-    with open('MV_stats.csv', 'wb') as csvfile:
-        
-        # Define a pyscenedetect manager using our wrapper class defined 
-        # above to set parameters how we want
-        manager = scenedetect.manager.SceneManager(
-            PySceneDetectArgs(input=video_file, threshold=threshold,
-                              min_scene_len=min_scene_len, stats_file=csvfile
-                              ), detector)
-        
-        # Actually run the scene detection on the video
-        video_fps, frames_read, frames_processed = scenedetect.detect_scenes_file(video_file, manager)
+    # Start the video manager
+    video_mgr.start()
+    
+    # Detect the scenes
+    scene_mgr.detect_scenes(frame_source=video_mgr, start_time=base_timecode)
+    
+    # Retrieve scene list
+    scene_mgr_list = scene_mgr.get_scene_list(base_timecode)
+    
+    # Initialize scene list for analysis
+    scene_list = []
+    
+    # Build our list from the frame_timecode objects
+    for scene in scene_mgr_list:
+        start_frame, end_frame = scene
+        start_frame = start_frame.frame_num
+        scene_list.append(start_frame)
+    
+    # Extract some info
+    video_fps = end_frame.framerate
+    frames_read = end_frame.frame_num
+    
+    # Release the video manager
+    video_mgr.release()
     
     # Extract scene info from the manager
-    scene_list = manager.scene_list
     scene_list_msec = [(1000.0 * x) / float(video_fps) for x in scene_list]
-    scene_list_tc = [scenedetect.timecodes.get_string(x) for x in scene_list_msec]
     
     # Pull music video file into moviepy
     mv_clip = VideoFileClip(video_file)
@@ -147,11 +149,11 @@ if __name__ == '__main__':
     textclip_list = []
     
     # Loop over list of scenes, creating TextClips for each scene
-    for scene_idx in range(len(scene_list_tc) + 1):
+    for scene_idx in range(len(scene_list_msec) + 1):
         
         # Each iteration is the same except for the final scene which is
         # handled separately in the else statement
-        if scene_idx != len(scene_list_tc):
+        if scene_idx != len(scene_list_msec):
             
             # Calculate duration of the scene in seconds
             duration = (scene_list_msec[scene_idx] - previous_scene_msec) / 1000
@@ -200,7 +202,6 @@ if __name__ == '__main__':
     # Convert our scene lists to numpy arrays
     scene_list_array = np.array(scene_list)
     scene_list_array_msec = np.array(scene_list_msec)
-    scene_list_tc_array = np.array(scene_list_tc)
     
     # Stack the scene data together
     scene_array = np.column_stack((scene_list_array, scene_list_array_msec))

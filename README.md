@@ -27,9 +27,9 @@ On the other end of the scale, there are also cases in which scene transitions a
 These libraries are required to run the code in this repository:
 
 * `youtube_dl` is used to download videos from youtube for analysis
-* `pyscenedetect` is used to detect transitions in videos
-* `moviepy` is used to create data visualizations and compose resulting videos
-* `librosa` is used for audio analysis to visualize the audio waveform
+* `pyscenedetect` is used to detect transitions in videos (v0.5-beta-1, master branch from github, some older versions won't work, if you run into scenedetect problems, try updating this from github)
+* `moviepy` is used to create data visualizations and compose resulting videos (version 0.2.3.5)
+* `librosa` is used for audio analysis to visualize the audio waveform (version 0.6.2)
 
 Other Requirements:
 
@@ -37,7 +37,7 @@ Other Requirements:
 * `numpy` for some number manipulation
 * `pandas` for some data manipulation
 
-I am running this code using Python 2.7.14 in Ubuntu 17.10. It is untested in Python 3. If you run into problems on Python 3 and you really want to run it yourself, let me know what is giving you a problem either through an issue or a pull request and I can take a look.
+I am running this code using Python 3.6.6 in Ubuntu 18.04. Video downloading with `youtube_dl` won't work correctly in Python 2 without decoding the function arguments in to utf-8. 
 
 ## Running the Code
 

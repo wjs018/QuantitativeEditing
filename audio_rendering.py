@@ -98,7 +98,7 @@ def animate_audio(video, audio, output):
 if __name__ == '__main__':
     
     # Import source video and extract the audio to an mp3
-    video = VideoFileClip('BTS_2016_Fire.mkv')
+    video = VideoFileClip('BTS_2017_DNA.mkv')
     audio = video.audio
     audio.write_audiofile('extracted_audio.mp3')
     

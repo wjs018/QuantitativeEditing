@@ -25,12 +25,10 @@ if __name__ == '__main__':
     # Download the video, setting the name first
     print('Downloading video...')
     video_file = '_'.join([artist_name, video_year, video_title])
-    ydl_file = video_file.decode('utf-8')
-    ydl_link = youtube_link.decode('utf-8')
     
     # Check if video has already been downloaded
     if not os.path.isfile(video_file + '.mkv'):
-        vd.download_video(ydl_link, output=ydl_file)
+        vd.download_video(youtube_link, output=video_file)
             
         # Done downloading video
         print('Done downloading video! Moving on to scene detection...')
@@ -40,7 +38,7 @@ if __name__ == '__main__':
     # Analyze the video for scene transitions
     video_fps, frames_read, _, scene_list = ds.analyze_video(
         video_file + '.mkv', threshold=threshold, min_scene_len=min_scene_len,
-        type='content', downscale_factor=4)
+        downscale_factor=1)
     
     # Done analyzing video!
     print('Done analyzing video! Moving on to annotated video creation...')
