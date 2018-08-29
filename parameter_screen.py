@@ -7,19 +7,20 @@ from moviepy.editor import *
 if __name__ == '__main__':
     
     # Specify video location here
-    video_file = 'TWICE_2016_TT.mkv'
-    outfile_prefix = 'TWICE_2016_TT_'
+    video_file = 'The Incredible Hulk - Trailer.mkv'
+    outfile_dir = '/media/unraid/Datasets/QuantitativeEditing'
+    outfile_prefix = 'Hulk_trailer_'
     
     # Specify range to vary for threshold value
-    for threshold in range(37, 41):
+    for threshold in range(15, 40):
         
         # Try a couple different minimum scene lengths for each threshold
         for min_scene_len in [5, 10, 15]:
             
-            # Analyze the video
+            # Analyze the video for scene transitions
             video_fps, frames_read, _, scene_list = ds.analyze_video(
-                video_file, threshold=threshold, min_scene_len=min_scene_len,
-                type='content', downscale_factor=4)
+                video_file, threshold=threshold,
+                min_scene_len=min_scene_len, downscale_factor=1)
             
             # Convert detected scenes to time
             scene_list_msec = [(1000.0 * x) / float(video_fps)
@@ -87,10 +88,12 @@ if __name__ == '__main__':
                                              size=(W, H))
             
             # Save resulting video to file, formatting name to avoid overwrites
-            final_video.write_videofile(outfile_prefix + 
-                                        str(threshold) + '_' + 
-                                        str(min_scene_len) + '.mp4',
-                                        fps=video_fps, preset='ultrafast')
+            outfile_name = outfile_prefix + (str(threshold) + '_' + 
+                                             str(min_scene_len) + '.mp4')
+            outfile = os.path.join(outfile_dir, outfile_name)
+            final_video.write_videofile(outfile,
+                                        fps=video_fps,
+                                        preset='ultrafast')
             
             # Having some memory overflow problems on my laptop, deleting some
             # variables and forcing garbage collection fixes that
