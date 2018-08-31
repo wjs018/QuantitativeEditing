@@ -7,15 +7,15 @@ from moviepy.editor import *
 if __name__ == '__main__':
     
     # Specify video location here
-    video_file = 'The Incredible Hulk - Trailer.mkv'
+    video_file = 'Spider-Man - Trailer.mp4'
     outfile_dir = '/media/unraid/Datasets/QuantitativeEditing'
-    outfile_prefix = 'Hulk_trailer_'
+    outfile_prefix = 'Spider-Man_trailer_'
     
     # Specify range to vary for threshold value
-    for threshold in range(15, 40):
+    for threshold in range(30, 31):
         
         # Try a couple different minimum scene lengths for each threshold
-        for min_scene_len in [5, 10, 15]:
+        for min_scene_len in [10]:
             
             # Analyze the video for scene transitions
             video_fps, frames_read, _, scene_list = ds.analyze_video(

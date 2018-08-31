@@ -45,6 +45,8 @@ To see the start to end process of how I analyze a single video, you can look at
 
 In order to settle on the parameters used in scene detection, I use `parameter_screen.py` to analyze and create videos with a large number of different settings. This process can take a long time. With my current settings, it usually takes about 4-8 hours on my laptop depending on how many conditions I am screening.
 
+If you want to analyze a folder full of `.mp4` and `.mkv` videos, you can use `analyze_folder.py`, making sure to specify the folder in the beginning of the script. All the videos will be analyzed using the same settings for threshold and minimum scene length.
+
 ## Contact
 
 Feel free to reach out with questions/issues or make pull requests with optimizations and compatibility fixes. I can be reached at quantitative.editing@gmail.com
