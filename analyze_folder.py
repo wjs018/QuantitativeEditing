@@ -22,6 +22,9 @@ if __name__ == '__main__':
     threshold = 30
     min_scene_len = 10
     
+    # Resize video to 1920 wide before composing?
+    resize = True
+    
     # Build our list of files to analyze
     mp4_list = glob.glob(source_folder + '/*.mp4')
     mkv_list = glob.glob(source_folder + '/*.mkv')
@@ -40,6 +43,10 @@ if __name__ == '__main__':
          
         # Pull video file into moviepy
         video_clip = VideoFileClip(video_file)
+        
+        if resize:
+            video_clip = video_clip.resize(width=1920)
+        
         W, H = video_clip.size
          
         # Get rid of audio if set
