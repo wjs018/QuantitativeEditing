@@ -18,16 +18,12 @@ def analyze_video(video_file, threshold=30, min_scene_len=10, downscale_factor=1
     scene_mgr.add_detector(
         sd.ContentDetector(threshold=threshold, min_scene_len=min_scene_len))
     
-    # Get the starting timecode
-    base_timecode = video_mgr.get_base_timecode()
-    
     # Start the video manager
     video_mgr.set_downscale_factor(downscale_factor)
     video_mgr.start()
     
     # Detect the scenes
-    scene_mgr.detect_scenes(frame_source=video_mgr, start_time=base_timecode,
-                            show_progress=True)
+    scene_mgr.detect_scenes(frame_source=video_mgr, show_progress=True)
     
     # Retrieve scene list
     scene_mgr_list = scene_mgr.get_scene_list(base_timecode)
