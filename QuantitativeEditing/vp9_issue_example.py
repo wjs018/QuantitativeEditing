@@ -1,3 +1,7 @@
+"""This code provides an example of how scenedetection can fail for videos that 
+use vp9 video encoding rather than avc.
+"""
+
 import os
 import scenedetect as sd
 import youtube_dl
