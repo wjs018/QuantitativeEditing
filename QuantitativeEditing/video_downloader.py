@@ -1,22 +1,28 @@
-from __future__ import unicode_literals
-
 import pandas as pd
 import os
 import youtube_dl
 
 
-def download_video(url, output=u'video'):
+def download_video(url, output='video', quiet=True):
     """
     Download a video from youtube with a given url and destination filepath.
     
-    Both input arguments must be utf-8 encoded.
+    url and output must be utf-8 encoded.
+    
+    If quiet is true, stdout will be suppressed.
     """
     
     ydl_opts = {}
     ydl_opts['outtmpl'] = output
+    ydl_opts['quiet'] = quiet
+    ydl_opts['merge_output_format'] = 'mkv'
     
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
+        result = ydl.extract_info(url, download=False)
+        outfile = ydl.prepare_filename(result) + '.' + result['ext']
+    
+    return outfile
 
 
 if __name__ == '__main__':
@@ -27,10 +33,7 @@ if __name__ == '__main__':
     video_list = pd.read_csv('video_list.csv')
     
     # Specify folder to save MVs to
-    video_folder = "/home/walter/Videos/Music Videos/"
-    
-    # Dictionary to put output filenames into
-    ydl_opts = {}
+    video_folder = "/media/unraid/Datasets/QuantitativeEditing/To Analyze/"
     
     for idx, row in video_list.iterrows():
         
@@ -38,13 +41,8 @@ if __name__ == '__main__':
         cols = [0, 3, 1]
         outfile = '_'.join(str(i) for i in row[cols].tolist())
         
-        # Check to see if MV already exists
-        if os.path.isfile(os.path.join(video_folder, outfile + '.mkv')):
-            continue
+        video_file = download_video(row[4],
+                                    output=os.path.join(video_folder, outfile),
+                                    quiet=False)
         
-        # Set output filename for MV to pass to youtube_dl
-        ydl_opts['outtmpl'] = os.path.join(video_folder, outfile)
-        
-        # Download the video
-        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-            ydl.download([row[4]])
+        print(video_file)

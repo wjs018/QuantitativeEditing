@@ -26,10 +26,10 @@ On the other end of the scale, there are also cases in which scene transitions a
 
 These libraries are required to run the code in this repository:
 
-* `youtube_dl` is used to download videos from youtube for analysis
-* `pyscenedetect` is used to detect transitions in videos (v0.5-beta-1, master branch from github, some older versions won't work, if you run into scenedetect problems, try updating this from github)
-* `moviepy` is used to create data visualizations and compose resulting videos (version 0.2.3.5)
-* `librosa` is used for audio analysis to visualize the audio waveform (version 0.6.2)
+* `youtube_dl` is used to download videos from youtube for analysis ([Github](https://github.com/rg3/youtube-dl))
+* `pyscenedetect` is used to detect transitions in videos ([Github](https://github.com/Breakthrough/PySceneDetect)) (v0.5, some older versions won't work, if you run into scenedetect problems, try updating this)
+* `moviepy` is used to create data visualizations and compose resulting videos ([Github](https://github.com/Zulko/moviepy)) (version 0.2.3.5)
+* `librosa` is used for audio analysis to visualize the audio waveform ([Github](https://github.com/librosa/librosa)) (version 0.6.2)
 
 Other Requirements:
 

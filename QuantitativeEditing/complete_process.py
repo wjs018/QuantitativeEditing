@@ -11,33 +11,43 @@ from moviepy.video.io.bindings import mplfig_to_npimage
 if __name__ == '__main__':
     
     # Some video constants to set
-    youtube_link = 'https://www.youtube.com/watch?v=MBdVXkSdhwU'
-    video_title = 'DNA'
-    artist_name = 'BTS'
-    video_year = '2017'
-    include_audio = False
-    render_audioplot = True  # Time intensive, 2+ hours on my laptop
+    youtube_link = 'https://www.youtube.com/watch?v=MS10Zz49FHE'
+    video_title = 'Up and Down'
+    artist_name = 'EXID'
+    video_year = '2014'
+    video_ext = '.mkv'
+    include_audio = True
+    render_audioplot = False  # Time intensive, 2+ hours on my laptop
     
     # Some scenedetect constants to set
-    threshold = 21
-    min_scene_len = 15
+    threshold = 30
+    min_scene_len = 10
     
     # Download the video, setting the name first
     print('Downloading video...')
-    video_file = '_'.join([artist_name, video_year, video_title])
+    video_file_no_ext = '_'.join([artist_name, video_year, video_title])
     
     # Check if video has already been downloaded
-    if not os.path.isfile(video_file + '.mkv'):
-        vd.download_video(youtube_link, output=video_file)
+    if not os.path.isfile(video_file_no_ext + video_ext):
+        video_file = vd.download_video(youtube_link, output=video_file_no_ext, quiet=False)
+        print(video_file)
             
         # Done downloading video
         print('Done downloading video! Moving on to scene detection...')
     else:
+        video_file = video_file_no_ext + video_ext
         print('Video already downloaded. Moving on to scene detection...')
+    
+    # Check if youtube-dl gave us the right output file or if it was merged
+    if not os.path.isfile(video_file):
+        video_file = video_file_no_ext + '.mkv'
+        if not os.path.isfile(video_file):
+            print(video_file)
+            print('Video file does not exist!')
     
     # Analyze the video for scene transitions
     video_fps, frames_read, _, scene_list = ds.analyze_video(
-        video_file + '.mkv', threshold=threshold, min_scene_len=min_scene_len,
+        video_file, threshold=threshold, min_scene_len=min_scene_len,
         downscale_factor=1)
     
     # Done analyzing video!
@@ -47,7 +57,7 @@ if __name__ == '__main__':
     scene_list_msec = [(1000.0 * x) / float(video_fps) for x in scene_list]
     
     # Pull video file into moviepy
-    video_clip = VideoFileClip(video_file + '.mkv')
+    video_clip = VideoFileClip(video_file)
     W, H = video_clip.size
     
     # Get rid of audio if set
@@ -284,7 +294,7 @@ if __name__ == '__main__':
         print('Done second animation! Moving on to audio waveform rendering...')
         
         # Define our variables
-        input_video = video_file + '.mkv'
+        input_video = video_file
         audio_output = 'extracted_audio.mp3'
         graph_output = 'audio_animation.mp4'
         
@@ -389,3 +399,13 @@ if __name__ == '__main__':
     
     # Print progress
     print('Finished analysis and video creation!')
+    print('Cleaning up temporary files...')
+    
+#     os.remove('animation1.mp4')
+#     os.remove('animation2.mp4')
+#     os.remove('video_scenelist.csv')
+#     if render_audioplot:
+#         os.remove(graph_output)
+#         os.remove(audio_output)
+    
+    print('Done!')

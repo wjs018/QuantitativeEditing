@@ -19,7 +19,7 @@ if __name__ == '__main__':
     render_audioplot = True  # Time intensive
     
     # Some scenedetect constants to set
-    threshold = 30
+    threshold = 40
     min_scene_len = 10
     
     # Resize video to 1920 wide before composing?
