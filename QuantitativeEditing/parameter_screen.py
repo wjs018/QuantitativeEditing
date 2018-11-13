@@ -1,5 +1,3 @@
-import scenedetect
-import detect_scenes as ds
 import gc
 import scenedetect as sd
 
@@ -8,9 +6,9 @@ from moviepy.editor import *
 if __name__ == '__main__':
     
     # Specify video location here
-    video_file = '/media/unraid/Datasets/QuantitativeEditing/To Analyze/Norazo_2013_Wild Horse.mkv'
+    video_file = '/media/unraid/Datasets/QuantitativeEditing/To Analyze/Bad Lip Reading_2018_Sample of My Pasta.mkv'
     outfile_dir = '/media/unraid/Datasets/QuantitativeEditing/Parameter Screen/'
-    outfile_prefix = 'Norazo_2013_Wild Horse_'
+    outfile_prefix = 'Bad Lip Reading_2018_Sample of My Pasta_'
     
     # First, load into a video manager
     video_mgr = sd.VideoManager([video_file])
@@ -23,11 +21,6 @@ if __name__ == '__main__':
         # Try a couple different minimum scene lengths for each threshold
         for min_scene_len in [5, 10, 15]:
             
-            # Analyze the video for scene transitions
-#             video_fps, frames_read, _, scene_list = ds.analyze_video(
-#                 video_file, threshold=threshold,
-#                 min_scene_len=min_scene_len, downscale_factor=1)
-            
             # Add a content detector
             scene_mgr.add_detector(
                 sd.ContentDetector(threshold=threshold,
@@ -35,13 +28,13 @@ if __name__ == '__main__':
             
             # Get the starting timecode
             base_timecode = video_mgr.get_base_timecode()
-    
+            
             # Start the video manager
             video_mgr.set_downscale_factor(1)
             video_mgr.start()
     
             # Detect the scenes
-            scene_mgr.detect_scenes(frame_source=video_mgr, start_time=base_timecode)
+            scene_mgr.detect_scenes(frame_source=video_mgr)
     
             # Retrieve scene list
             scene_mgr_list = scene_mgr.get_scene_list(base_timecode)

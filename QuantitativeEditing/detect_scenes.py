@@ -65,7 +65,7 @@ def analyze_video(video_file, threshold=40, min_scene_len=15, stats_file=None,
     video_mgr.start()
     
     # Detect the scenes
-    scene_mgr.detect_scenes(frame_source=video_mgr, start_time=base_timecode)
+    scene_mgr.detect_scenes(frame_source=video_mgr)
     
     # Retrieve scene list
     scene_mgr_list = scene_mgr.get_scene_list(base_timecode)
